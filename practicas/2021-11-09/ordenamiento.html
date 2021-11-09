@@ -1,0 +1,22 @@
+<!-- Crea un programa que ordene n cantidad de números de menor a mayor -->
+
+<script>
+	
+	var numeros=[5,0,0,56,-100,-4,512,40];
+
+	var repetir;
+	do{
+		ordenado=true;
+		for(let a=0; a<numeros.length-1; a++){
+			if(numeros[a]>numeros[a+1]){
+				let num_temp=numeros[a];
+				numeros[a]=numeros[a+1];
+				numeros[a+1]=num_temp;
+				ordenado=false;
+			}
+		}
+	}while(!ordenado);
+
+	console.log(numeros);
+
+</script>

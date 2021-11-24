@@ -1,6 +1,7 @@
 ﻿class Program{
 
-    int logitud_tablero=12;
+    int logitud_tablero=20;
+    int barcos=5;
     String[] tablero1;
     String[] tablero2;
     String[] jugadores=new String[2];
@@ -27,10 +28,10 @@
         }
 
         pintarTablero(0);
-        ponerBarcos(3,0);
+        ponerBarcos(barcos,0);
         Console.Clear();
         pintarTablero(1);
-        ponerBarcos(3,1);
+        ponerBarcos(barcos,1);
         Console.Clear();
         comenzarJuego();
     }

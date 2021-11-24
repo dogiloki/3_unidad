@@ -1,0 +1,15 @@
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.csproj.AssemblyReference.cache
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.GeneratedMSBuildEditorConfig.editorconfig
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.AssemblyInfoInputs.cache
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.AssemblyInfo.cs
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.csproj.CoreCompileInputs.cache
+E:\Github\uptecamac\3_unidad\c#\naval\bin\Debug\net6.0\naval.exe
+E:\Github\uptecamac\3_unidad\c#\naval\bin\Debug\net6.0\naval.deps.json
+E:\Github\uptecamac\3_unidad\c#\naval\bin\Debug\net6.0\naval.runtimeconfig.json
+E:\Github\uptecamac\3_unidad\c#\naval\bin\Debug\net6.0\naval.dll
+E:\Github\uptecamac\3_unidad\c#\naval\bin\Debug\net6.0\ref\naval.dll
+E:\Github\uptecamac\3_unidad\c#\naval\bin\Debug\net6.0\naval.pdb
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.dll
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\ref\naval.dll
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.pdb
+E:\Github\uptecamac\3_unidad\c#\naval\obj\Debug\net6.0\naval.genruntimeconfig.cache

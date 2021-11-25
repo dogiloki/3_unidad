@@ -12,27 +12,25 @@
         String volver_jugar;
 
         do{
+            Console.Clear();
             do{
-                Console.Clear();
                 Console.Write("Nombre del jugador 1: ");
                 jugadores[0]=Console.ReadLine();
             }while(jugadores[0]=="");
+            Console.Write("\n");
             do{
-                Console.Clear();
                 Console.Write("Nombre del jugador 2: ");
                 jugadores[1]=Console.ReadLine();
             }while(jugadores[1]=="");
-            Console.Clear();
-            
+
             for(int a=0; a<logitud_tablero; a++){
                 tablero1[a]=" ";
                 tablero2[a]=" ";
             }
 
-            pintarTablero(0);
-            ponerBarcos(barcos,0);
             Console.Clear();
-            pintarTablero(1);
+            ponerBarcos(barcos,0);
+            Console.Write("\n");
             ponerBarcos(barcos,1);
             Console.Clear();
             comenzarJuego();
@@ -82,7 +80,7 @@
         pintarTablero(0);
         Console.Write("\n");
         pintarTablero(1);
-        Console.WriteLine("\nEl ganador es: "+jugadores[ganador()]);
+        Console.WriteLine("\nEl ganador es "+jugadores[ganador()]);
     }
 
     public int ganador(){
@@ -139,6 +137,8 @@
 
     public void ponerBarcos(int barcos, int jugador){
         for(int a=1; a<=barcos; a++){
+            Console.Clear();
+            pintarTablero(jugador);
             int posicion_barco;
             Boolean existe;
             do{
@@ -163,8 +163,6 @@
             }else{
                 tablero2[posicion_barco-1]="0";
             }
-            Console.Clear();
-            pintarTablero(jugador);
         }
     }
 

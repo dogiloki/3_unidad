@@ -1,7 +1,7 @@
 ﻿class Program{
 
-    int logitud_tablero=20;
-    int barcos=5;
+    int logitud_tablero=12;
+    int barcos=3;
     String[] tablero1;
     String[] tablero2;
     String[] jugadores=new String[2];
@@ -9,34 +9,39 @@
     public Program(){
         tablero1=new String[logitud_tablero];
         tablero2=new String[logitud_tablero];
+        String volver_jugar;
 
         do{
+            do{
+                Console.Clear();
+                Console.Write("Nombre del jugador 1: ");
+                jugadores[0]=Console.ReadLine();
+            }while(jugadores[0]=="");
+            do{
+                Console.Clear();
+                Console.Write("Nombre del jugador 2: ");
+                jugadores[1]=Console.ReadLine();
+            }while(jugadores[1]=="");
             Console.Clear();
-            Console.Write("Nombre del jugador 1: ");
-            jugadores[0]=Console.ReadLine();
-        }while(jugadores[0]=="");
-        do{
-            Console.Clear();
-            Console.Write("Nombre del jugador 2: ");
-            jugadores[1]=Console.ReadLine();
-        }while(jugadores[1]=="");
-        Console.Clear();
-        
-        for(int a=0; a<logitud_tablero; a++){
-            tablero1[a]=" ";
-            tablero2[a]=" ";
-        }
+            
+            for(int a=0; a<logitud_tablero; a++){
+                tablero1[a]=" ";
+                tablero2[a]=" ";
+            }
 
-        pintarTablero(0);
-        ponerBarcos(barcos,0);
-        Console.Clear();
-        pintarTablero(1);
-        ponerBarcos(barcos,1);
-        Console.Clear();
-        comenzarJuego();
+            pintarTablero(0);
+            ponerBarcos(barcos,0);
+            Console.Clear();
+            pintarTablero(1);
+            ponerBarcos(barcos,1);
+            Console.Clear();
+            comenzarJuego();
+            Console.Write("\nVolver a jugar s/n: ");
+            volver_jugar=Console.ReadLine();
+        }while(volver_jugar=="s" || volver_jugar=="S");
     }
 
-    void comenzarJuego(){
+    public void comenzarJuego(){
         int turno=0;
         int posicion=1;
         do{
@@ -45,9 +50,13 @@
             Console.Write("\n");
             pintarTablero(1);
             Console.Write("\nTurno de "+jugadores[turno]+"\nPosición de ataque: ");
-            posicion=Int32.Parse(Console.ReadLine());
+            try{
+                posicion=Int32.Parse(Console.ReadLine());
+            }catch(Exception ex){
+                posicion=0;
+            }
             if(posicion>logitud_tablero || posicion<=0){
-                Console.WriteLine("Posición no válida");
+                Console.WriteLine("Posición no válida\nHas fallado en el ataque");
             }else{
                 if(turno==0){
                     if(existeBarco(1,posicion)){
@@ -73,10 +82,10 @@
         pintarTablero(0);
         Console.Write("\n");
         pintarTablero(1);
-        Console.Write("\nEl ganador es: "+jugadores[ganador()]);
+        Console.WriteLine("\nEl ganador es: "+jugadores[ganador()]);
     }
 
-    int ganador(){
+    public int ganador(){
         for(int a=0; a<logitud_tablero; a++){
             if(tablero1[a]!=" "){
                 return 0;
@@ -88,7 +97,7 @@
         return 0;
     }
 
-    Boolean terminoJuego(){
+    public Boolean terminoJuego(){
         Boolean termino=true;
         for(int a=0; a<logitud_tablero; a++){
             if(tablero1[a]!=" "){
@@ -109,7 +118,7 @@
         return termino;
     }
     
-    void pintarTablero(int jugador){
+    public void pintarTablero(int jugador){
         Console.WriteLine("Jugador: "+jugadores[jugador]);
         for(int fila=0; fila<3; fila++){
             for(int columna=1; columna<=logitud_tablero; columna++){
@@ -128,13 +137,17 @@
         }
     }
 
-    void ponerBarcos(int barcos, int jugador){
+    public void ponerBarcos(int barcos, int jugador){
         for(int a=1; a<=barcos; a++){
             int posicion_barco;
             Boolean existe;
             do{
                 Console.Write("Posición de barco "+a+": ");
-                posicion_barco=Int32.Parse(Console.ReadLine());
+                try{
+                    posicion_barco=Int32.Parse(Console.ReadLine());
+                }catch(Exception ex){
+                    posicion_barco=0;
+                }
                 existe=true;
                 if(posicion_barco>logitud_tablero || posicion_barco<=0){
                     Console.WriteLine("Posición no válida");
@@ -155,7 +168,7 @@
         }
     }
 
-    Boolean existeBarco(int jugador,int posicion){
+    public Boolean existeBarco(int jugador,int posicion){
         if(jugador==0){
             return (tablero1[posicion-1]!=" ");
         }else{
@@ -163,7 +176,7 @@
         }
     }
 
-    String espaciosVacios(int num){
+    public String espaciosVacios(int num){
         String espacios="";
         for(int a=0; a<num; a++){
             espacios+=" ";

@@ -1,0 +1,496 @@
+<script>
+	
+	const ALFABETO=" ABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789,.-abcdefghijklmnñopqrstuvwxyzÁÉÍÓÚáéíóú";
+	// Usar como mínimo 9 caracteres, un espacio vacío al principio, no usar números, y sin repetir caracteres. Ejemplo, abcdhfgjk
+	const CARACTERES_CIFRAR=" LMNfBCDoprsFabGghHtuZWXYwRSTvUxyijklmnzAEIcdeJKOPqQV";
+	const LOGITUD_MATRIZ=3 // No cambiar, el determinante y la inversa están adaptadas para logitud de 3
+
+	var globales={
+		opcion:"",
+		llave:"1,1,0,1,0,1,0,1,0",
+		matrices:{},
+		fracciones:{},
+		textos:{},
+		numeros:{}
+	};
+
+	globales.matrices={
+		separar:function(separador,matriz){
+			let texto="";
+			for(let a=0; a<matriz.length; a++){
+				texto+=matriz[a]+separador.toString();
+			}
+			return (texto=="")?texto:globales.textos.remplazarPosiciones([texto.length-1],"",texto);
+		},
+		determinante:function(matriz){
+			if(matriz.length==2){
+				return ((matriz[0][0]??0)*(matriz[1][1]??0))-(((matriz[0][1]??0)*(matriz[1][0]??0)));
+			}else
+			if(matriz.length==3){
+				let operacion=0;
+				operacion+=(Number(matriz[0][0])??0)*(Number(matriz[1][1])??0)*(Number(matriz[2][2])??0);
+				operacion+=(Number(matriz[0][1])??0)*(Number(matriz[1][2])??0)*(Number(matriz[2][0])??0);
+				operacion+=(Number(matriz[0][2])??0)*(Number(matriz[1][0])??0)*(Number(matriz[2][1])??0);
+				operacion-=(Number(matriz[2][0])??0)*(Number(matriz[1][1])??0)*(Number(matriz[0][2])??0);
+				operacion-=(Number(matriz[2][1])??0)*(Number(matriz[1][2])??0)*(Number(matriz[0][0])??0);
+				operacion-=(Number(matriz[2][2])??0)*(Number(matriz[1][0])??0)*(Number(matriz[0][1])??0);
+				return operacion;
+			}
+			return "";
+		},
+		dimensionar:function(logitud,matriz){
+			let matriz_final=[];
+			let contador_matriz=0;
+			for(let fila=0; fila<logitud; fila++){
+				matriz_final[fila]=[];
+				for(let columna=0; columna<logitud; columna++){
+					matriz_final[fila][columna]=matriz[contador_matriz]??0;
+					contador_matriz++;
+				}
+			}
+			return matriz_final;
+		},
+		esMultiplicable:function(matriz1,matriz2){
+			return (matriz1[0].length==matriz2.length);
+		},
+		multiplicar:function(matriz1,matriz2){
+			let matriz_final=[];
+			if(typeof matriz1!="object" && (globales.numeros.es.numero(matriz1) || globales.fracciones.esFracion(matriz1))){
+				for(let fila=0; fila<matriz2.length; fila++){
+					matriz_final[fila]=[];
+					for(let columna=0; columna<matriz2[fila].length; columna++){
+						matriz_final[fila][columna]=globales.fracciones.multiplicar(matriz1,matriz2[fila][columna]??0);
+					}
+				}
+			}else
+			if(globales.matrices.esMultiplicable(matriz1,matriz2)){
+				for(let fila_matriz1=0; fila_matriz1<matriz1.length; fila_matriz1++){
+					matriz_final[fila_matriz1]=[];
+					for(let fila=0; fila<matriz2[0].length; fila++){
+						let suma_temp=0;
+						for(let columna=0; columna<matriz2.length; columna++){
+							let num1=matriz1[fila_matriz1][columna]??0;
+							let num2=matriz2[columna][fila]??0;
+							suma_temp=globales.fracciones.sumar(suma_temp,globales.fracciones.multiplicar(num1,num2));
+						}
+						matriz_final[fila_matriz1][fila]=suma_temp;
+					}
+				}
+			}else{
+				console.log("No se puede multiplicar la matriz");
+			}
+			return matriz_final;
+		},
+		generarVacia:function(filas,columnas){
+			let matriz=[];
+			for(let f=0; f<filas; f++){
+				matriz[f]=[];
+				for(let c=0; c<columnas; c++){
+					matriz[f][c]="";
+				}
+			}
+			return matriz;
+		},
+		inversa:function(logitud,matriz){
+			if(logitud<3 || matriz.length<3 || matriz[0].length<3){
+				return -1;
+			}
+			let determinante=globales.matrices.determinante(matriz);
+			matriz_nueva=globales.matrices.generarVacia(logitud,logitud);
+			matriz_nueva[0][0]=1*(Number(matriz[1][1])*Number(matriz[2][2])-Number(matriz[1][2])*Number(matriz[2][1]));
+			matriz_nueva[1][0]=-1*(Number(matriz[1][0])*Number(matriz[2][2])-Number(matriz[1][2])*Number(matriz[2][0]));
+			matriz_nueva[2][0]=1*(Number(matriz[1][0])*Number(matriz[2][1])-Number(matriz[1][1])*Number(matriz[2][0]));
+			matriz_nueva[0][1]=-1*(Number(matriz[0][1])*Number(matriz[2][2])-Number(matriz[0][2])*Number(matriz[2][1]));
+			matriz_nueva[1][1]=1*(Number(matriz[0][0])*Number(matriz[2][2])-Number(matriz[0][2])*Number(matriz[2][0]));
+			matriz_nueva[2][1]=-1*(Number(matriz[0][0])*Number(matriz[2][1])-Number(matriz[0][1])*Number(matriz[2][0]));
+			matriz_nueva[0][2]=1*(Number(matriz[0][1])*Number(matriz[1][2])-Number(matriz[0][2])*Number(matriz[1][1]));
+			matriz_nueva[1][2]=-1*(Number(matriz[0][0])*Number(matriz[1][2])-Number(matriz[0][2])*Number(matriz[1][0]));
+			matriz_nueva[2][2]=1*(Number(matriz[0][0])*Number(matriz[1][1])-Number(matriz[0][1])*Number(matriz[1][0]));
+			return (determinante==0 || determinante=="")?-1:globales.matrices.multiplicar(1+"/"+determinante.toString(),matriz_nueva);
+			//return [[1,0,-1],[0,0,1],[-1,1,1]];
+		}
+	};
+
+	globales.fracciones={
+		fraccionar:function(num1,num2){
+			if(globales.numeros.es.numero(num1)){
+				num1+="/1";
+			}
+			if(globales.numeros.es.numero(num2)){
+				num2+="/1";
+			}
+			let n1=globales.textos.separar("/",num1);
+			let n2=globales.textos.separar("/",num2);
+			for(let a=0; a<n1.length; a++){
+				n1[a]=Number(n1[a]);
+				n2[a]=Number(n2[a]);
+			}
+			return{
+				"n1":n1,
+				"n2":n2
+			};
+		},
+		multiplicar:function(num1,num2){
+			let numero=globales.fracciones.fraccionar(num1.toString(),num2.toString());
+			let n1=numero.n1;
+			let n2=numero.n2;
+			let faccion=n1[0]*n2[0]+"/"+n1[1]*n2[1];
+			return globales.fracciones.reducir(faccion);
+		},
+		sumar:function(num1,num2){
+			let numero=globales.fracciones.fraccionar(num1.toString(),num2.toString());
+			let n1=numero.n1;
+			let n2=numero.n2;
+			let faccion=(n1[1]==n2[1])?((n1[0]+n2[0])+"/"+n1[1]):(((n1[0]*n2[1])+(n1[1]*n2[0]))+"/"+(n1[1]*n2[1]));
+			return globales.fracciones.reducir(faccion);
+		},
+		restar:function(num1,num2){
+			let numero=globales.fracciones.fraccionar(num1.toString(),num2.toString());
+			let n1=numero.n1;
+			let n2=numero.n2;
+			let faccion=(n1[1]==n2[1])?((n1[0]-n2[0])+"/"+n1[1]):(((n1[0]*n2[1])-(n1[1]*n2[0]))+"/"+(n1[1]*n2[1]));
+			return globales.fracciones.reducir(faccion);
+		},
+		reducir:function(faccion){
+			let numero=globales.textos.separar("/",faccion);
+			if(numero[0]==0){
+				return 0;
+			}else
+			if(numero[1]==1){
+				return Number(numero[0]);
+			}else
+			if(globales.numeros.es.decimal(numero[0]/numero[1])){
+				return faccion;
+			}else{
+				return Number(numero[0]/numero[1]);
+			}
+		},
+		esFracion:function(texto){
+			let fraccion=globales.textos.separar("/",texto);
+			if(fraccion.length==2 && globales.numeros.es.numero(fraccion[0]) && globales.numeros.es.numero(fraccion[1])){
+				return true;
+			}
+			return false;
+		}
+	};
+
+	globales.textos={
+		buscar:{
+			posicion:function(texto,caracter){
+				for(let a=0; a<texto.length; a++){
+					if(texto[a]==caracter){
+						return a;
+					}
+				}
+				return -1;
+			},
+			letra:function(texto,posicion){
+				for(let a=0; a<texto.length; a++){
+					if(a==posicion){
+						return texto[a];
+					}
+				}
+				return "";
+			}
+		},
+		remplazarLetra:function(caracter1,caracter2,texto){
+			let texto_final="";
+			for(let a=0; a<texto.length; a++){
+				texto_final+=(texto[a]==caracter1)?caracter2:texto[a];
+			}
+			return texto_final;
+		},
+		remplazarPosiciones:function(posiciones,remplazar,texto){
+			let texto_final="";
+			for(let a=0; a<texto.length; a++){
+				for(let b=0; b<posiciones.length; b++){
+					texto_final+=(a==posiciones[b])?remplazar:texto[a];
+				}
+			}
+			return texto_final;
+		},
+		separar:function(separador,texto){
+			let matriz=[];
+			let posicion=0;
+			let contador_matriz=0;
+			for(let a=0; a<texto.length; a++){
+				if(texto[a]==separador){
+					let letras="";
+					for(let b=posicion; b<a; b++){
+						letras+=texto[b];
+					}
+					matriz[contador_matriz]=letras;
+					posicion=a+1;
+					contador_matriz++;
+				}
+			}
+			let letras="";
+			for(let b=posicion; b<texto.length; b++){
+				letras+=texto[b];
+			}
+			matriz[contador_matriz]=letras;
+			return matriz;
+		}
+	};
+
+	globales.numeros={
+		es:{
+			numero:function(texto){
+				texto??=" ";
+				if(texto=="" || texto=="."){ return false; }
+				if(texto=="0"){ return true; }
+				let decimales=0;
+				if(texto[0]=="-"){
+					texto=globales.textos.remplazarLetra("-","",texto);
+				}
+				for(let a=0; a<texto.length; a++){
+					if(texto[a]=="."){
+						decimales++;
+					}else
+					if(parseFloat(texto[a]).toString()=="NaN"){
+						return false;
+					}
+					if(decimales>1){
+						return false;
+					}
+				}
+				return true;
+			},
+			decimal:function(texto){
+				if(globales.numeros.es.numero(texto)){
+					if(texto%1==0){
+						return false;
+					}
+				}else{
+					return false;
+				}
+				return true;
+			},
+			negativo:function(texto){
+				if(globales.numeros.es.numero(texto)){
+					if(texto[0]!="-"){
+						return false;
+					}
+				}
+				return true;
+			}
+		},
+		aleatorio(separador,cantidad,min,max){
+			let texto="";
+			for(let a=0; a<cantidad; a++){
+				texto+=Math.round(Math.random()*(Number(max)-Number(min))+Number(min))+separador;
+			}
+			return (texto=="")?texto:globales.textos.remplazarPosiciones([texto.length-1],"",texto);
+		},
+		cambiarSigno:function(num){
+			return num+(num*-2);
+		},
+		modular:function(num,mod){
+			return num-(Math.floor(num/mod)*mod);
+		}
+	};
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	do{
+		globales.opcion=parseInt(prompt("Llave actual: "+globales.llave+" \n\n1 - Cifrar\n2 - Descifrar\n3 - Cambiar llave\n4.- Generar llave aleatoria\n0 - Salir"));
+
+		switch(globales.opcion){
+			case 1: alert(cifrado(true,prompt("Digite texto a cifrar")??"")); break;
+			case 2: alert(cifrado(false,prompt("Digite texto a descifrar")??"")); break;
+			case 3: alert(cambiarLlave(LOGITUD_MATRIZ)); break;
+			case 4: alert(generarllaveAleatoria(LOGITUD_MATRIZ,prompt("Número mínimo a generar")??0,prompt("Número máximo a generar")??0));
+			case 0: break;
+			default: alert("Opción no válida"); break;
+		}
+	}while(globales.opcion!=0);
+
+	function cifrado(cifrar,texto){
+		let matriz_codificada;
+		let matriz_cifrada;
+		let cifrado_aleatorio;
+		if(cifrar){
+			matriz_codificada=codificarTexto(LOGITUD_MATRIZ,texto);
+			matriz_cifrada=cifradoMatriz(LOGITUD_MATRIZ,true,matriz_codificada);
+			cifrado_aleatorio=cifradoAleatorio(matriz_cifrada);
+			return cifrado_aleatorio;
+		}else{
+			descifrado_aleatorio=descifradoAleatorio(LOGITUD_MATRIZ,texto);
+			matriz_descifrada=cifradoMatriz(LOGITUD_MATRIZ,false,descifrado_aleatorio);
+			matriz_descodificada=descodificarTexto(matriz_descifrada);
+			return matriz_descodificada;
+		}
+	}
+
+	function codificarTexto(logitud_matriz,texto){
+		let filas=logitud_matriz;
+		let columnas=Math.ceil(texto.length/logitud_matriz);
+		let matriz=globales.matrices.generarVacia(filas,columnas);
+		let conta_texto=0;
+		for(let c=0; c<matriz[0].length; c++){
+			for(let f=0; f<matriz.length; f++){
+				let posicion_busqueda=globales.textos.buscar.posicion(ALFABETO,texto[conta_texto]??" ");
+				if(posicion_busqueda==-1){
+					alert("El carácter ( "+texto[conta_texto]+" ) no es válido");
+					return -1;
+				}else{
+					matriz[f][c]=posicion_busqueda;
+				}
+				conta_texto++;
+			}
+		}
+		return matriz;
+	}
+
+	function descodificarTexto(matriz){
+		let texto="";
+		for(let columna=0; columna<matriz[0].length; columna++){
+			for(let fila=0; fila<matriz.length; fila++){
+				texto+=globales.textos.buscar.letra(ALFABETO,matriz[fila][columna]);
+			}
+		}
+		return texto;
+	}
+
+	function cifradoMatriz(logitud_matriz,cifrar,matriz){
+		let matriz_llave=globales.matrices.dimensionar(logitud_matriz,globales.textos.separar(",",globales.llave));
+		let matriz_inversa=globales.matrices.inversa(logitud_matriz,matriz_llave);
+		if(matriz_inversa==-1){
+			alert("Llave no válida");
+			return -1;
+		}else{
+			matriz_llave=(cifrar)?matriz_llave:matriz_inversa;
+			return globales.matrices.multiplicar(matriz_llave,matriz);
+		}
+	}
+
+	function cifradoAleatorio(matriz){
+		let texto="";
+		let num_fin1=Math.round(Math.random()*(9-1)+1);
+		let num_fin2=Math.round(Math.random()*(9-1)+1);
+		let num_matrices=(matriz[0]??"").length;
+		for(let fila=0; fila<matriz.length; fila++){
+			let num1=Math.round(Math.random()*((CARACTERES_CIFRAR.length-1)-1)+1);
+			let num2=Math.round(Math.random()*((CARACTERES_CIFRAR.length-1)-1)+1);
+			let num3=Math.round(Math.random()*((CARACTERES_CIFRAR.length-1)-1)+1);
+			for(let columna=0; columna<matriz[fila].length; columna++){
+				//texto+=matriz[fila][columna]+",";
+				switch(globales.numeros.modular(columna,LOGITUD_MATRIZ)){
+					case 0: texto+=CARACTERES_CIFRAR[num1]+matriz[fila][columna]*num1; break;
+					case 1: texto+=CARACTERES_CIFRAR[num2]+matriz[fila][columna]*num2; break;
+					case 2: texto+=CARACTERES_CIFRAR[num3]+matriz[fila][columna]*num3; break;
+				}
+			}
+		}
+		texto+=(texto=="")?"":CARACTERES_CIFRAR[num_fin1]+((num_matrices*num_fin2)*num_fin1)+CARACTERES_CIFRAR[num_fin2];
+		return texto;
+	}
+
+	function descifradoAleatorio(logitud_matriz,texto){
+		let cantidad_matrices="";
+		let obtener_cantidad=false;
+		for(let a=texto.length-2; a>0; a--){
+			(globales.numeros.es.numero(texto[a]))?(cantidad_matrices=texto[a]+cantidad_matrices):(a=0);
+		}
+		let num1=globales.textos.buscar.posicion(CARACTERES_CIFRAR,texto[texto.length-1]);
+		let num2=globales.textos.buscar.posicion(CARACTERES_CIFRAR,texto[texto.length-(cantidad_matrices.toString().length+2)]);
+		cantidad_matrices=(parseInt(cantidad_matrices)/num1)/num2;
+		let matriz=[];
+		let posi_texto=-1;
+		for(let fila=0; fila<logitud_matriz; fila++){
+			matriz[fila]=[];
+			for(let columna=0; columna<parseInt(cantidad_matrices); columna++){
+				let encontro_letra=false;
+				let posi_letra=posi_texto;
+				while(!encontro_letra){
+					posi_letra++;
+					if(!globales.numeros.es.numero(texto[posi_letra])){
+						encontro_letra=true;
+						let encontro_numero=false;
+						let posi_numero=posi_letra;
+						let numero="";
+						while(encontro_numero==false){
+							posi_numero++;
+							if(globales.numeros.es.numero(texto[posi_numero])){
+								numero+=texto[posi_numero];
+							}else{
+								encontro_numero=true;
+							}
+						}
+						posi_numero--;
+						matriz[fila][columna]=numero/globales.textos.buscar.posicion(CARACTERES_CIFRAR,texto[posi_letra]);
+						posi_texto=posi_numero;
+					}
+				}
+			}
+		}
+		return matriz;
+	}
+
+	function cambiarLlave(logitud_matriz){
+		let llave="";
+		let repetir="";
+		do{
+			llave=globales.textos.remplazarLetra(" ","",prompt(repetir+"\n\nDigite "+LOGITUD_MATRIZ*LOGITUD_MATRIZ+" números enteros positivos separados por comas.\nEjemplo: "+globales.numeros.aleatorio(",",logitud_matriz*logitud_matriz,0,20))??"cancelar");
+			let matriz=globales.textos.separar(",",llave);
+			let matriz_llave=globales.matrices.dimensionar(logitud_matriz,matriz);
+			let determinante=globales.matrices.determinante(matriz_llave);
+			if(llave=="cancelar"){
+				repetir="";
+				llave=globales.llave;
+			}else
+			if(llave==""){
+				repetir="llave no válida (cancelar para salir)";
+			}else
+			if(matriz.length!=logitud_matriz*logitud_matriz){
+				repetir="llave no válida (no cumple con la logitud)";
+			}else
+			if(determinante==0 || determinante==""){
+				repetir="llave no váilda (su determinante es 0)";
+			}else{
+				for(let a=0; a<matriz.length; a++){
+					if(globales.numeros.es.decimal(matriz[a])){
+						repetir="Llave no válida (los números no son enteros)";
+						a=matriz.length;
+					}else
+					if(globales.numeros.es.negativo(matriz[a])){
+						repetir="Llave no válida (los datos deben ser sólo números enteros positivos)";
+						a=matriz.length;
+					}else
+					if(!globales.numeros.es.numero(matriz[a])){
+						repetir="Llave no válida (los datos deben ser sólo números enteros)";
+						a=matriz.length;
+					}else{
+						repetir="";
+					}
+				}
+			}
+		}while(repetir!="");
+		globales.llave=llave;
+		return "Llave actual: "+globales.llave;
+	}
+
+	function generarllaveAleatoria(logitud_matriz,min,max){
+		if((min!="" || max!="") && (globales.numeros.es.numero(min) && globales.numeros.es.numero(max)) &&
+			(!globales.numeros.es.negativo(min) && !globales.numeros.es.negativo(max))){
+			let llave=globales.numeros.aleatorio(",",logitud_matriz*logitud_matriz,min,max);
+			let matriz=globales.textos.separar(",",llave);
+			let matriz_llave=globales.matrices.dimensionar(logitud_matriz,matriz);
+			let modificada="";
+			if(globales.matrices.determinante(matriz_llave)==0){
+				matriz[0]=Number(matriz_llave[0][0])+1;
+				if((matriz[0]-1)!=matriz[matriz.length-1]){
+					matriz[matriz.length-1]=Number(matriz_llave[logitud_matriz-1][logitud_matriz-1])+1;
+				}else{
+					matriz[Math.floor(matriz.length/2)]=Number(matriz_llave[logitud_matriz-1][logitud_matriz-1])+1;
+				}
+				modificada="La llave fue modificada debido a que su determinante era 0";
+			}
+			globales.llave=globales.matrices.separar(",",matriz);
+			return modificada+"\n\nLlave cambiada a: "+globales.llave;
+		}else{
+			return "Lo números no son válidos (deben ser números enteros positivos)";
+		}
+	}
+
+</script>

@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Name{
+
     class Program{
 
         int logitud_tablero=12;
@@ -188,5 +189,7 @@ namespace Name{
         static void Main(string[] args){
             new Program();
         }
+
     }
+    
 }

@@ -47,7 +47,7 @@
             pintarTablero(0);
             Console.Write("\n");
             pintarTablero(1);
-            Console.Write("\nTurno de "+jugadores[turno]+"\nPosición de ataque: ");
+            Console.Write("\nTurno de "+jugadores[turno]+"\nPosición del ataque: ");
             try{
                 posicion=Int32.Parse(Console.ReadLine());
             }catch(Exception ex){
@@ -142,7 +142,7 @@
             int posicion_barco;
             Boolean existe;
             do{
-                Console.Write("Posición de barco "+a+": ");
+                Console.Write("Posición del barco "+a+": ");
                 try{
                     posicion_barco=Int32.Parse(Console.ReadLine());
                 }catch(Exception ex){

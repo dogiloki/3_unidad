@@ -45,7 +45,7 @@ namespace Name{
 
         public void comenzarJuego(){
             int turno=0;
-            int posicion=1;
+            int posicion;
             do{
                 Console.Clear();
                 pintarTablero(0);
@@ -60,23 +60,18 @@ namespace Name{
                 if(posicion>logitud_tablero || posicion<=0){
                     Console.WriteLine("Posición no válida\nHas fallado en el ataque");
                 }else{
-                    if(turno==0){
-                        if(existeBarco(1,posicion)){
+                    if(existeBarco((turno==0)?1:0,posicion)){
+                        Console.WriteLine("\nHas eliminado un barco");
+                        if(turno==0){
                             tablero2[posicion-1]=" ";
-                            Console.WriteLine("\nHas eliminado un barco");
                         }else{
-                            Console.WriteLine("\nHas fallado el ataque");
+                            tablero1[posicion-1]=" ";
                         }
                     }else{
-                        if(existeBarco(0,posicion)){
-                            tablero1[posicion-1]=" ";
-                            Console.WriteLine("\nHas eliminado un barco");
-                        }else{
-                            Console.WriteLine("\nHas fallado el ataque");
-                        }
+                        Console.WriteLine("\nHas fallado el ataque");
                     }
                 }
-                turno=(turno==1)?0:1;
+                turno=(turno==0)?1:0;
                 Console.WriteLine("\nEnter para continuar...");
                 Console.ReadKey();
             }while(!terminoJuego() || posicion>logitud_tablero || posicion<=0);
@@ -84,7 +79,7 @@ namespace Name{
             pintarTablero(0);
             Console.Write("\n");
             pintarTablero(1);
-            Console.WriteLine("\nEl ganador es "+jugadores[ganador()]);
+            Console.WriteLine("\nHa ganado "+jugadores[ganador()]);
         }
 
         public int ganador(){
